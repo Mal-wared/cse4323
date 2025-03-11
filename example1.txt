@@ -1,0 +1,5 @@
+add $t1 $t2 $t3
+sub $t4 $t1 $t2
+loop: sub $t4 $t1 $t2
+
+poop
