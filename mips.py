@@ -1,15 +1,17 @@
 class MIPS_Simulator:
     def __init__(self, file_name = None):
-        self.registers = {f'$t{i}': 0 for i in range(8)}
-        self.memory = {}
-        self.labels = {}
-        self.instructions = []
-        self.file_name = file_name
-        self.current_instruction = 0
+        self.registers = {f'$t{i}': 0 for i in range(8)}    # generates $t0-$t7 registers
+        self.memory = {}                                    # holds sparse memory locations
+        self.labels = {}                                    # holds labels and their corresponding line numbers
+        self.instructions = []                              # holds instructions to run
+        self.file_name = file_name                          # holds file name that is being parsed
+        self.current_instruction = 0                        # holds current instruction number for rest of code
     
+    # sets file name to be parsed in case not set upon creating object
     def set_file_name(self, file_name):
         self.file_name = file_name
 
+    # parses file into necessary data structures such as arrays for processing
     def parse_file(self):
         with open(self.file_name, 'r') as file:
             current_line = 0
@@ -30,6 +32,7 @@ class MIPS_Simulator:
                     self.instructions.append(line)
                 current_line += 1
 
+    # processes instruction and runs necessary operation
     def execute_instruction(self, instruction):
         label_instruction = []
         parts = []
@@ -64,22 +67,27 @@ class MIPS_Simulator:
     def sub(self, dest, src1, src2):
         self.registers[dest] = self.registers[src1] - self.registers[src2]
 
+    # loads word from memory into reg
     def lw(self, dest, src):
         self.registers[dest] = self.memory[src]
 
+    # stores word from reg into memory
     def sw(self, src, dest):
         self.memory[dest] = self.registers[src]
 
+    # branch if equal
     def beq(self, src1, src2, label):
         if self.registers[src1] == self.registers[src2]:
             self.execute_instruction(self.instructions[self.labels[label]])
 
+    # branch if greater than
     def bgt(self, src1, src2, label):
         print("something something bgt")
         if self.registers[src1] > self.registers[src2]:
             self.execute_instruction(self.instructions[self.labels[label]])
             print(f'Jumping to {label}')
 
+    # prints out state of registers for debugging 
     def get_status(self):
         print("Registers:")
         for reg in self.registers: 
@@ -88,7 +96,7 @@ class MIPS_Simulator:
         print(f'Instructions: {self.instructions}')
         print(f'Memory: {self.memory}')
         
-
+    # executes the instructions in the given file
     def run(self):
         self.parse_file()
         while self.current_instruction < len(self.instructions):
@@ -98,8 +106,12 @@ class MIPS_Simulator:
         print(f'Final Memory State: {self.memory}')
             
 if __name__ == "__main__":
-    mips = MIPS_Simulator("example2.txt")
-    mips.registers["$t2"] = 1
-    mips.registers["$t3"] = 1
-    mips.registers["$t4"] = 1
+    # create mips simulator object
+    mips = MIPS_Simulator("example1.txt")
+
+    # initialize register values
+    mips.registers["$t2"] = 6
+    mips.registers["$t3"] = 4
+
+    # run the simulator/execute instructions in the file fed into the sim
     mips.run()
